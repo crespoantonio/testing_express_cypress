@@ -37,7 +37,7 @@ describe('/user/register', ()=>{
     it('doesnt allow user creation with invalid email', ()=>{
         let badTestUser = {
             name:'validUser',
-            email:'invalid',
+            email:'invalidEmail',
             password:'validPassword'
         }
         cy.request({
