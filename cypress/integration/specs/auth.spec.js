@@ -1,10 +1,13 @@
+const Guid = require('guid')
+
 
 describe('/user/register', ()=>{
     const registerEndpoint = 'http://localhost:3000/api/user/register'
     it('create user with valid body', ()=>{
+        let dynamicEmail = Guid.raw() + '@bar.com'
         let body = {
             name:'testName',
-            email:'foo@bar.com',
+            email: dynamicEmail,
             password:'Test1234'
         }
     
@@ -12,7 +15,7 @@ describe('/user/register', ()=>{
         .then((response)=>{
             expect(response.status).to.eq(200);
             expect(response.body.name).to.eq('testName');
-            expect(response.body.email).to.eq('foo@bar.com');
+            expect(response.body.email).to.eq(dynamicEmail);
             expect(response.body.password).to.eq('Test1234');
     
         })
@@ -59,6 +62,23 @@ describe('/user/register', ()=>{
             failOnStatusCode: false,
         }).then((response)=>{
             expect(response.status).to.eq(400);
+        })
+    })
+
+    it('doesnt allow user creation with existing email', ()=>{
+        let badTestUser = {
+            name:'validUser',
+            email:'staticEmail@gmail.com',
+            password:'validPassword'
+        }
+        cy.request({
+            method: 'POST',
+            url: registerEndpoint,
+            failOnStatusCode: false,
+            body: badTestUser
+        }).then((response)=>{
+            expect(response.status).to.eq(400);
+            expect(response.body).to.eq('Email already registered');
         })
     })
 })
